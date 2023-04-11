@@ -1,11 +1,42 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
+import { useState,useEffect } from 'react';
 import './EditPost.css'
+import { supabase } from '../client'
 
 const EditPost = ({data}) => {
 
     const {id} = useParams();
     const post = data.filter(item => item.id === id)[0];
+    console.log(data)
+    const [posts, setPost] = useState([]);
+
+    useEffect(() => {
+        const fetchData= async () =>{
+            const {data} = await supabase
+            .from('Posts')
+            .select()
+            .eq('id',id);
+            // set state of posts
+            setPost(data);
+        }
+        
+        fetchData().catch(console.error());
+        setPost(data);
+    }, [data]);
+    // UPDATE post
+    const updatePost = async (event) => {
+    event.preventDefault();
+
+    await supabase
+    .from('Posts')
+    .update({ title: post.title, author: post.author,  description: post.description})
+    .eq('id', id);
+
+
+    window.location = "/";
+}
+
 
     return (
         <div>
